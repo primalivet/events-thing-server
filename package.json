@@ -1,13 +1,13 @@
 {
   "name": "events-thing-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "API using Express and MongoDB for practice",
   "main": "server.js",
   "scripts": {
     "start": "set NODE_ENV=development&&nodemon --harmony server.js",
     "test": "set NODE_ENV=test&&tape ./tests/**/*.js"
   },
-  "author": "",
+  "author": "primalivet",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^1.0.2",
