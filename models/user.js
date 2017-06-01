@@ -16,7 +16,10 @@ const UserSchema = new Schema({
     required: [true, 'password is required'],
     select: false,
   },
-  admin: Boolean,
+  admin: {
+    type: Boolean,
+    select: false,
+  },
 });
 
 UserSchema.virtual('events', {

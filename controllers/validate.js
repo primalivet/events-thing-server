@@ -1,8 +1,8 @@
 /**
- * validator
+ * request
  */
 
-const validator = (req, res, schema) =>
+exports.request = (req, res, schema) =>
   new Promise((resolve, reject) => {
     req.check(schema);
     req.getValidationResult()
@@ -16,5 +16,3 @@ const validator = (req, res, schema) =>
       })
       .catch(error => reject({ message: 'Could not validate the request', error }));
   });
-
-module.exports = validator;

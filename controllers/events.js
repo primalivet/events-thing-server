@@ -84,7 +84,10 @@ exports.getEvents = (req, res) =>
         .skip(offset)
         .populate('author');
     } catch (error) {
-      reject({ message: 'Could not retrive events', error });
+      reject({
+        message: 'Could not retrive events',
+        error,
+      });
     }
 
     if (!events.length) reject({ message: 'No events 😞' });
@@ -96,7 +99,10 @@ exports.getEvents = (req, res) =>
         .sort('start')
         .count();
     } catch (error) {
-      reject({ message: 'Could not retrive events total count', error });
+      reject({
+        message: 'Could not retrive events total count',
+        error,
+      });
     }
 
     const { self, first, last, next, prev } = pagination({ req, count, limit, offset, date });
@@ -115,23 +121,28 @@ exports.getEvents = (req, res) =>
 // eslint-disable-next-line no-unused-vars
 exports.postEvent = (req, res) =>
   new Promise((resolve, reject) => {
-    const event = new Event();
+    // eslint-disable-next-line no-param-reassign
+    req.body.start = moment(req.body.start).toISOString();
 
-    event.name = req.body.name;
+    if (req.body.end) {
+      // eslint-disable-next-line no-param-reassign
+      req.body.end = moment(req.body.end).toISOString();
+    }
 
-    if (req.body.description) event.description = req.body.description;
+    // eslint-disable-next-line no-param-reassign
+    req.body.author = req.user._id;
 
-    event.start = moment(req.body.start).toISOString();
-
-    if (req.body.end) event.end = moment(req.body.end).toISOString();
-
-    event.author = req.cookies.user;
-
-    event.save()
-      .then((item) => {
-        resolve({ message: 'The event was saved successfully', item });
-      })
-      .catch(error => reject({ message: 'Could not save the event', error }));
+    new Event(req.body).save()
+      .then((event) => {
+        resolve({
+          message: 'The event was successfully saved',
+          item: event,
+        })
+        .catch(error => reject({
+          message: 'Could not save the event',
+          error,
+        }));
+      });
   });
 
 /**
@@ -144,8 +155,15 @@ exports.getEvent = (req, res) =>
     const self = `${req.protocol}://${req.get('host')}${req.baseUrl}${req.path}`;
 
     Event.findById(req.params._id)
-      .then(event => resolve({ item: event, meta: { _id: req.params._id }, links: { self } }))
-      .catch(error => reject({ message: 'No event with that id', error }));
+      .then(event => resolve({
+        item: event,
+        meta: { _id: req.params._id },
+        links: { self },
+      }))
+      .catch(error => reject({
+        message: 'No event with that id',
+        error,
+      }));
   });
 
 
@@ -158,14 +176,35 @@ exports.putEvent = (req, res) =>
   new Promise(async (resolve, reject) => {
     const self = `${req.protocol}://${req.get('host')}${req.baseUrl}${req.path}`;
 
-    if (req.body.dates && req.body.start) req.body.start = moment(req.body.start).toISOString();
-    if (req.body.dates && req.body.end) req.body.end = moment(req.body.end).toISOString();
+    if (req.body.dates && req.body.start) {
+      // eslint-disable-next-line no-param-reassign
+      req.body.start = moment(req.body.start).toISOString();
+    }
+
+    if (req.body.dates && req.body.end) {
+      // eslint-disable-next-line no-param-reassign
+      req.body.end = moment(req.body.end).toISOString();
+    }
 
     try {
-      const event = await Event.findOneAndUpdate({ _id: req.params._id }, req.body, { new: true, runValidators: true }).exec();
-      resolve({ message: 'The event was updated successfully', item: event, meta: { _id: req.params._id }, links: { self } });
+      const event = await Event.findOneAndUpdate({
+        _id: req.params._id,
+      }, req.body, {
+        new: true,
+        runValidators: true,
+      }).exec();
+
+      resolve({
+        message: 'The event was updated successfully',
+        item: event,
+        meta: { _id: req.params._id },
+        links: { self },
+      });
     } catch (error) {
-      reject({ message: 'The event could be updated or it dosen\'t exist.', error });
+      reject({
+        message: 'The event could be updated or it dosen\'t exist.',
+        error,
+      });
     }
   });
 
@@ -177,8 +216,13 @@ exports.putEvent = (req, res) =>
 exports.deleteEvent = (req, res) =>
   new Promise((resolve, reject) => {
     Event.remove({ _id: req.params._id })
-      .then(() => resolve({ message: 'Event deleted successfully' }))
-      .catch(error => reject({ message: 'Could not delete the event', error }));
+      .then(() => resolve({
+        message: 'Event deleted successfully',
+      }))
+      .catch(error => reject({
+        message: 'Could not delete the event',
+        error,
+      }));
   });
 
 /**
@@ -190,7 +234,7 @@ exports.confirmEventAuthor = (req, res) =>
   new Promise((resolve, reject) => {
     Event.findById(req.params._id)
       .then((event) => {
-        if (event.author.toString() !== req.cookies.user) {
+        if (event.author.toString() !== req.user._id) {
           reject({ message: 'Big no-no mate, you are not the author of this event' });
         } else {
           resolve({ message: 'You are the author of this event, go head!' });

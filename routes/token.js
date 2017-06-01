@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.post('/',
   (req, res, next) => {
-    controllers.validator(req, res, controllers.token.validationSchema.body)
+    controllers.validate.request(req, res, controllers.token.validationSchema.body)
       .then(() => next())
       .catch(error => res.json(error));
   },

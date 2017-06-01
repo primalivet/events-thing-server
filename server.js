@@ -42,6 +42,8 @@ app.use('/api/events', routes.events);
 app.use('/api/users', routes.users);
 app.use('/api/token', routes.token);
 
+app.get('*', (req, res) => res.send('Nothing here, API is at: \n 👉 /api/events \n 👉 /api/users \n 👉 /api/token'));
+
 app.listen(process.env.PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`Server 🏃 on http://localhost:${process.env.PORT}`);

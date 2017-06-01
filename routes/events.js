@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get('/',
   (req, res, next) => {
-    controllers.validator(req, res, controllers.events.schema.getEvents)
+    controllers.validate.request(req, res, controllers.events.schema.getEvents)
       .then(() => next())
       .catch(error => res.json(error));
   },
@@ -31,7 +31,7 @@ router.post('/',
       .catch(error => res.json(error));
   },
   (req, res, next) => {
-    controllers.validator(req, res, controllers.events.schema.postEvent)
+    controllers.validate.request(req, res, controllers.events.schema.postEvent)
       .then(() => next())
       .catch(error => res.json(error));
   },
@@ -68,7 +68,7 @@ router.put('/:_id',
       .catch(error => res.json(error));
   },
   (req, res, next) => {
-    controllers.validator(req, res, controllers.events.schema.putEvent)
+    controllers.validate.request(req, res, controllers.events.schema.putEvent)
       .then(() => next())
       .catch(error => res.json(error));
   },

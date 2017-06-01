@@ -16,7 +16,7 @@ router.get('/',
       .catch(error => res.json(error));
   },
   (req, res, next) => {
-    controllers.validator(req, res, controllers.users.validationSchema.query)
+    controllers.validate.request(req, res, controllers.users.schema.getUsers)
     .then(() => next())
     .catch(error => res.json(error));
   },
@@ -33,7 +33,7 @@ router.get('/',
 
 router.post('/',
   (req, res, next) => {
-    controllers.validator(req, res, controllers.users.validationSchema.body)
+    controllers.validate.request(req, res, controllers.users.schema.postUser)
       .then(() => next())
       .catch(error => res.json(error));
   },
@@ -49,6 +49,11 @@ router.post('/',
  */
 
 router.get('/:_id',
+  (req, res, next) => {
+    controllers.token.checkForToken(req, res)
+      .then(() => next())
+      .catch(error => res.json(error));
+  },
   (req, res) => {
     controllers.users.getUser(req, res)
       .then(response => res.json(response))
@@ -61,7 +66,17 @@ router.get('/:_id',
 
 router.put('/:_id',
   (req, res, next) => {
-    controllers.validator(req, res, controllers.users.validationSchema.body)
+    controllers.token.verifyToken(req, res)
+      .then(() => next())
+      .catch(error => res.json(error));
+  },
+  (req, res, next) => {
+    controllers.users.confirmUser(req, res)
+      .then(() => next())
+      .catch(error => res.json(error));
+  },
+  (req, res, next) => {
+    controllers.validate.request(req, res, controllers.users.schema.putUser)
       .then(() => next())
       .catch(error => res.json(error));
   },
