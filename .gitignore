@@ -1,5 +1,5 @@
 .thumb
 .DS_Store
 node_modules
-variable.development.env
-variable.test.env
+variables.development.env
+variables.test.env
