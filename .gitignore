@@ -3,3 +3,4 @@
 node_modules
 variables.development.env
 variables.test.env
+npm-debug.log
