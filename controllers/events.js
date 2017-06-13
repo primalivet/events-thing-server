@@ -137,12 +137,12 @@ exports.postEvent = (req, res) =>
         resolve({
           message: 'The event was successfully saved',
           item: event,
-        })
-        .catch(error => reject({
-          message: 'Could not save the event',
-          error,
-        }));
-      });
+        });
+      })
+      .catch(error => reject({
+        message: 'Could not save the event',
+        error,
+      }));
   });
 
 /**
@@ -234,10 +234,13 @@ exports.confirmEventAuthor = (req, res) =>
   new Promise((resolve, reject) => {
     Event.findById(req.params._id)
       .then((event) => {
-        if (event.author.toString() !== req.user._id) {
+        if (event.author.toString() !== req.user._id.toString()) {
           reject({ message: 'Big no-no mate, you are not the author of this event' });
         } else {
           resolve({ message: 'You are the author of this event, go head!' });
         }
+      })
+      .catch((error) => {
+        reject({ message: 'No event with that id', error });
       });
   });
