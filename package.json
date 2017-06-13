@@ -4,8 +4,10 @@
   "description": "API using Express and MongoDB for practice",
   "main": "server.js",
   "scripts": {
-    "start": "set NODE_ENV=development&&nodemon --harmony server.js",
-    "test": "set NODE_ENV=test&&tape ./tests/**/*.js"
+    "start": "NODE_ENV=development node --harmony server.js",
+    "test": "NODE_ENV=test tape ./test/*.test.js",
+    "windowsStart": "set NODE_ENV=development&&node --harmony server.js",
+    "windowsTest": "set NODE_ENV=test&&tape ./test/*.test.js"
   },
   "author": "primalivet",
   "license": "ISC",
