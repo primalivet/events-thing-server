@@ -1,41 +1,23 @@
 const test = require('tape');
 const httpMocks = require('node-mocks-http');
-
-const app = require('../server.js');
 const controllers = require('../controllers/index');
-
 const User = require('../models/user');
 const Event = require('../models/event');
 
 let user;
 let event;
 
-const before = test;
-const after = test;
-
-const createUser = async () => {
-  user = await new User({
-    username: 'testuser',
-    password: 'password',
-  }).save();
-  return user;
-};
-
-const createEvent = async (author) => {
+test('Clean database and create test user and event', async (assert) => {
+  await User.remove({});
+  await Event.remove({});
+  user = await new User({ username: 'testuser', password: 'password' }).save();
   event = await new Event({
     name: 'Test event',
     description: 'Test event description',
     start: '2021-01-31T10:00:00',
     end: '2021-01-31T12:00:00',
-    author,
+    author: user._id,
   }).save();
-  return event;
-};
-
-before('Create test user and event', async (assert) => {
-  user = await createUser();
-  event = await createEvent(user._id);
-  assert.pass('Created user and event');
   assert.end();
 });
 
@@ -81,7 +63,7 @@ test('postEvent creates a new event', (assert) => {
       start: '2021-03-24T18:00:00',
       end: '2021-03-24T20:00:00',
     },
-    cookies: { user: user._id },
+    user,
   });
   const res = httpMocks.createResponse();
 
@@ -102,7 +84,11 @@ test('postEvent creates a new event', (assert) => {
 });
 
 test('getEvent retrives a single event', (assert) => {
-  const req = httpMocks.createRequest({ method: 'GET', url: `/api/events/${event._id}`, params: { _id: event._id } });
+  const req = httpMocks.createRequest({
+    method: 'GET',
+    url: `/api/events/${event._id}`,
+    params: { _id: event._id },
+  });
   const res = httpMocks.createResponse();
 
   return controllers.events.getEvent(req, res).then((response) => {
@@ -132,10 +118,8 @@ test('putEvent updates a single event and retives the new event', (assert) => {
   const req = httpMocks.createRequest({
     method: 'PUT',
     url: `/api/events/${event._id}`,
-    body: {
-      name: 'Updated Test event',
-    },
-    cookies: { user: user._id },
+    body: { name: 'Updated Test event' },
+    user,
     params: { _id: event._id },
   });
   const res = httpMocks.createResponse();
@@ -165,7 +149,9 @@ test('putEvent updates a single event and retives the new event', (assert) => {
 
 test('confirmEventAuthor resolves if the cookies user and event author is equal', (assert) => {
   const req = httpMocks.createRequest({
-    cookies: { user: user._id },
+    method: 'PUT',
+    url: `/api/events/${event._id}`,
+    user,
     params: { _id: event._id },
   });
   const res = httpMocks.createResponse();
@@ -178,7 +164,11 @@ test('confirmEventAuthor resolves if the cookies user and event author is equal'
 });
 
 test('deleteEvent deletes a single event', (assert) => {
-  const req = httpMocks.createRequest({ method: 'GET', url: `/api/events/${event._id}`, params: { _id: event._id } });
+  const req = httpMocks.createRequest({
+    method: 'GET',
+    url: `/api/events/${event._id}`,
+    params: { _id: event._id },
+  });
   const res = httpMocks.createResponse();
 
   return controllers.events.deleteEvent(req, res).then((response) => {
@@ -189,12 +179,10 @@ test('deleteEvent deletes a single event', (assert) => {
   });
 });
 
-
-after('Remove test users and events', async (assert) => {
+test('Remove test users and events', async (assert) => {
   await User.remove({});
   await Event.remove({});
   user = undefined;
   event = undefined;
-  assert.pass('Removed users and events');
   assert.end();
 });
