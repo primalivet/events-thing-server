@@ -49,7 +49,7 @@ exports.postToken = (req, res) =>
       })
       .then((user) => {
         // sign token
-        jwt.sign(user, req.app.get('superSecret'), { expiresIn: '24h' }, (error, token) => {
+        jwt.sign(user, process.env.SECRET, { expiresIn: '24h' }, (error, token) => {
           if (error) {
             reject({
               message: 'There was an error while signing your token',
@@ -100,7 +100,7 @@ exports.verifyToken = (req, res) =>
 
     if (token) {
       // verify and decode user
-      jwt.verify(token, req.app.get('superSecret'), (error, user) => {
+      jwt.verify(token, process.env.SECRET, (error, user) => {
         if (error) {
           reject({ message: 'Failed to authenticate token.' });
         } else {
@@ -127,7 +127,7 @@ exports.checkForToken = (req, res) =>
 
     if (token) {
       // verify and decode user
-      jwt.verify(token, req.app.get('superSecret'), (error, user) => {
+      jwt.verify(token, process.env.SECRET, (error, user) => {
         if (error) {
           reject({ message: 'You have a invalid token.' });
         } else {
