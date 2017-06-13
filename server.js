@@ -1,27 +1,18 @@
-const express = require('express');
-const mongoose = require('mongoose');
+const app = require('express')();
 const moment = require('moment');
 const validator = require('express-validator');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const routes = require('./routes/index');
+const database = require('./database');
 
 require('dotenv').config({ path: `variables.${process.env.NODE_ENV}.env` });
 
-const app = express();
+database();
 
-app.set('superSecret', process.env.SECRET);
-
-mongoose.Promise = global.Promise;
-mongoose.connect(process.env.DATABASE);
-mongoose.connection.on('error', (error) => {
-  // eslint-disable-next-line no-console
-  console.error(`${error.message}`);
-});
-
+// only show logs during development
 if (process.env.NODE_ENV === 'development') {
-  // only show logs during development
   app.use(morgan('dev'));
 }
 
@@ -44,9 +35,14 @@ app.use('/api/token', routes.token);
 
 app.get('*', (req, res) => res.send('Nothing here, API is at: \n 👉 /api/events \n 👉 /api/users \n 👉 /api/token'));
 
-app.listen(process.env.PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server 🏃 on http://localhost:${process.env.PORT}`);
-});
+// Only listen for connections when the server is
+// called directly from node. This avoids listening
+// for connections when running tests.
+if (require.main === module) {
+  app.listen(process.env.PORT, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Server on http://localhost:${process.env.PORT}`);
+  });
+}
 
 module.exports = app;
