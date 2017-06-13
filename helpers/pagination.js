@@ -1,14 +1,5 @@
 /**
  * Pagination
- * ---
- * returns an object with links to self, first, last, next
- * and prev page based on the settings object.
- * @param {object} settings - settings
- * @param {object} settings.req - express request object
- * @param {number} settings.count - the total count of items in "unpaged" query
- * @param {number} settings.limit - the limit of items per "page"
- * @param {number} settings.offset - the offset limit, usually 0
- * @param {string} settings.date - a valid "moment" string, used to filter query items
  */
 const pagination = ({ req, count, limit, offset, date }) => {
   if (!req || !count) return false;
