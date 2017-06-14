@@ -22,7 +22,7 @@ test('Clean database and create test user and event', async (assert) => {
 });
 
 test('getEvents retrives a list of events', (assert) => {
-  const req = httpMocks.createRequest({ method: 'GET', url: '/api/events' });
+  const req = httpMocks.createRequest();
   const res = httpMocks.createResponse();
 
   return controllers.events.getEvents(req, res).then((response) => {
@@ -55,15 +55,13 @@ test('getEvents retrives a list of events', (assert) => {
 
 test('postEvent creates a new event', (assert) => {
   const req = httpMocks.createRequest({
-    method: 'POST',
-    url: '/api/events',
+    user,
     body: {
       name: 'Posted test event',
       description: 'Posted test event description',
       start: '2021-03-24T18:00:00',
       end: '2021-03-24T20:00:00',
     },
-    user,
   });
   const res = httpMocks.createResponse();
 
@@ -84,11 +82,7 @@ test('postEvent creates a new event', (assert) => {
 });
 
 test('getEvent retrives a single event', (assert) => {
-  const req = httpMocks.createRequest({
-    method: 'GET',
-    url: `/api/events/${event._id}`,
-    params: { _id: event._id },
-  });
+  const req = httpMocks.createRequest({ params: { _id: event._id.toString() } });
   const res = httpMocks.createResponse();
 
   return controllers.events.getEvent(req, res).then((response) => {
@@ -108,7 +102,7 @@ test('getEvent retrives a single event', (assert) => {
 
     // response.meta
     assert.equal(typeof response.meta, 'object', 'meta is an object');
-    assert.equal(typeof response.meta._id, 'object', 'meta _id is a string');
+    assert.equal(typeof response.meta._id, 'string', 'meta _id is a string');
 
     assert.end();
   });
@@ -116,10 +110,8 @@ test('getEvent retrives a single event', (assert) => {
 
 test('putEvent updates a single event and retives the new event', (assert) => {
   const req = httpMocks.createRequest({
-    method: 'PUT',
-    url: `/api/events/${event._id}`,
-    body: { name: 'Updated Test event' },
     user,
+    body: { name: 'Updated Test event' },
     params: { _id: event._id },
   });
   const res = httpMocks.createResponse();
@@ -148,12 +140,7 @@ test('putEvent updates a single event and retives the new event', (assert) => {
 });
 
 test('confirmEventAuthor resolves if the cookies user and event author is equal', (assert) => {
-  const req = httpMocks.createRequest({
-    method: 'PUT',
-    url: `/api/events/${event._id}`,
-    user,
-    params: { _id: event._id },
-  });
+  const req = httpMocks.createRequest({ user, params: { _id: event._id } });
   const res = httpMocks.createResponse();
 
   return controllers.events.confirmEventAuthor(req, res).then((response) => {
@@ -164,11 +151,7 @@ test('confirmEventAuthor resolves if the cookies user and event author is equal'
 });
 
 test('deleteEvent deletes a single event', (assert) => {
-  const req = httpMocks.createRequest({
-    method: 'GET',
-    url: `/api/events/${event._id}`,
-    params: { _id: event._id },
-  });
+  const req = httpMocks.createRequest({ params: { _id: event._id } });
   const res = httpMocks.createResponse();
 
   return controllers.events.deleteEvent(req, res).then((response) => {
