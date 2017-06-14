@@ -147,13 +147,17 @@ exports.getUser = (req, res) =>
     let query;
 
     if (req.user && req.user._id === req.params._id) {
-      query = User.findById(req.params._id).select('+admin+password');
+      query = User.findById(req.params._id).select({
+        username: 1,
+        admin: 1,
+      });
     } else {
       query = User.findById(req.params._id);
     }
 
     query.then(user => resolve({
       item: user,
+      meta: { _id: req.params._id },
       links: { self },
     }))
     .catch(error => reject({
@@ -218,6 +222,6 @@ exports.deleteUser = (req, res) =>
 exports.confirmUser = (req, res) =>
   new Promise((resolve, reject) => {
     if (req.user.admin) resolve({ message: '👍 Wow! You\'r admin, move along and make it work!' });
-    if (req.user._id === req.params._id) resolve({ message: '👍 It\'s your page! Please go a head' });
+    if (req.user._id === req.params._id) resolve({ message: '👍 It\'s your profile! Please go a head' });
     reject({ message: '👎 Ohoh! You don\'t have the right privilige to do that mister' });
   });
