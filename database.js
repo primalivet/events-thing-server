@@ -1,12 +1,19 @@
 /* eslint-disable no-console */
 
+// requre dependencies
 const mongoose = require('mongoose');
 
+// wrap database connection so that we can export
+// and run it easily in our app as well as in our tests
 const database = () => {
+  // user global promises as mongoose promises
   mongoose.Promise = global.Promise;
 
+  // connect to the database
   mongoose.connect(process.env.DATABASE);
 
+  // the rest in this file is just different event handlers
+  // for the mongodb connection
   mongoose.connection.on('error', (error) => {
     console.log(error);
   });

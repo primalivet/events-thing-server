@@ -1,14 +1,25 @@
+// import and initiate Express
 const app = require('express')();
+
+// import other dependencies
 const moment = require('moment');
 const validator = require('express-validator');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+
+// import the routes
 const routes = require('./routes/index');
+
+// import the database
 const database = require('./database');
 
+// use the correct variables depending on the node evnviroment
+// NODE_ENV is set in package.json scripts
 require('dotenv').config({ path: `variables.${process.env.NODE_ENV}.env` });
 
+// run database, see the ./database.js file for more
+// information on that
 database();
 
 // only show logs during development
@@ -16,8 +27,11 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+// add the cookieParse to Express middleware
 app.use(cookieParser());
 
+// add the validator to Express middleware
+// and register some custom validators
 app.use(validator({
   customValidators: {
     isArray: value => Array.isArray(value),
@@ -26,9 +40,12 @@ app.use(validator({
   },
 }));
 
+// add the body parser to Express middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// setup routes, see each file inside the ./routes
+// directory for more information
 app.use('/api/events', routes.events);
 app.use('/api/users', routes.users);
 app.use('/api/token', routes.token);
