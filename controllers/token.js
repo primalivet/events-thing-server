@@ -57,6 +57,8 @@ exports.postToken = (req, res) =>
             });
           }
 
+          res.append('token', token);
+          res.append('user', user._id.toString());
           res.cookie('token', token);
           res.cookie('user', user._id.toString());
 
