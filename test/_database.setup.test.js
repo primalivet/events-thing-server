@@ -10,7 +10,3 @@ test('check if there is a connection', (assert) => {
   assert.equal(typeof mongoose.connection, 'object');
   assert.end();
 });
-
-test.onFinish(() => {
-  mongoose.disconnect();
-});
