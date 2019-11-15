@@ -24,7 +24,7 @@
     "jsonwebtoken": "^7.3.0",
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.11",
-    "mongoose": "^4.9.1",
+    "mongoose": "^5.7.11",
     "morgan": "^1.8.1",
     "node-mocks-http": "^1.6.2",
     "socket.io": "^2.0.1",
